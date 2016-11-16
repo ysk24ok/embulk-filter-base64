@@ -1,0 +1,24 @@
+in:
+  type: file
+  path_prefix: example/example_encode.csv
+  parser:
+    type: csv
+    columns:
+      - {name: id, type: long}
+      - {name: string to encode, type: string}
+      - {name: long to encode, type: string}
+      - {name: double to encode, type: string}
+      - {name: boolean to encode, type: string}
+      - {name: timestamp to encode, type: string}
+      - {name: json to encode, type: string}
+filters:
+  - type: base64
+    columns:
+      - {name: string to encode, encode: true}
+      - {name: long to encode, encode: true}
+      - {name: double to encode, encode: true}
+      - {name: boolean to encode, encode: true}
+      - {name: timestamp to encode, encode: true}
+      - {name: json to encode, encode: true}
+out:
+  type: stdout
