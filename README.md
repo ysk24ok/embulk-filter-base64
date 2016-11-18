@@ -17,6 +17,7 @@ An Embulk filter plugin to encode/decode string by Base64.
 
 ## Limitation
 
+* Java8 environment is needed because this plugin uses [java.util.Base64](https://docs.oracle.com/javase/8/docs/api/java/util/Base64.html) of Java8
 * Type of input value to be encoded must be string.
   - encoded value is string and is is needed to align the type of input and output value
     + e.g. 1234(string) is encoded into MTIzNA==(string)
@@ -103,6 +104,8 @@ timestamp to decode (timestamp) : 2017-01-01 00:00:00 UTC
 ### Todo
 
 * Write tests
+* [Support base64 in apache commons codec](https://github.com/ysk24ok/embulk-filter-base64/issues/1)
+* [Support encoder/decoder of URL and MIME](https://github.com/ysk24ok/embulk-filter-base64/issues/2)
 
 ## Build
 
