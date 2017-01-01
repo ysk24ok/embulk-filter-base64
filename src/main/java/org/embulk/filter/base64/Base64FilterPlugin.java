@@ -8,7 +8,6 @@ import java.util.Base64;
 import com.google.common.base.Optional;
 import org.embulk.config.Config;
 import org.embulk.config.ConfigDefault;
-import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.Task;
 import org.embulk.config.TaskSource;
@@ -50,15 +49,35 @@ public class Base64FilterPlugin
         public Optional<Boolean> getDoDecode();
     }
 
+    public void validate(PluginTask pluginTask, Schema inputSchema)
+    {
+        for (Base64ColumnTask task : pluginTask.getColumns()) {
+            // throws exception if the column name does not exist
+            inputSchema.lookupColumn(task.getName());
+            boolean doEncode = task.getDoEncode().get();
+            boolean doDecode = task.getDoDecode().get();
+            boolean bothTrue = doEncode && doDecode;
+            boolean bothFalse = !doEncode && !doDecode;
+            if (bothTrue || bothFalse) {
+                String errMsg = "Specify either 'encode: true' or 'decode: true'";
+                throw new DataException(errMsg);
+            }
+        }
+        for (Column column : inputSchema.getColumns()) {
+            Type colType = column.getType();
+            if (!Types.STRING.equals(colType)) {
+                String errMsg = "Type of input columns must be string";
+                throw new DataException(errMsg);
+            }
+        }
+    }
+
     @Override
     public void transaction(ConfigSource config, Schema inputSchema,
             FilterPlugin.Control control)
     {
         PluginTask task = config.loadConfig(PluginTask.class);
-        for (Base64ColumnTask base64ColTask: task.getColumns()) {
-            // throws exception if the column name does not exist
-            inputSchema.lookupColumn(base64ColTask.getName());
-        }
+        validate(task, inputSchema);
         Schema outputSchema = inputSchema;
         control.run(task.dump(), outputSchema);
     }
@@ -92,16 +111,6 @@ public class Base64FilterPlugin
                         }
                         Boolean doEncode = colTask.getDoEncode().get();
                         Boolean doDecode = colTask.getDoDecode().get();
-                        Boolean bothTrue = doEncode && doDecode;
-                        Boolean bothFalse = !doEncode && !doDecode;
-                        if (bothTrue || bothFalse) {
-                            String errMsg = "Specify either 'encode: true' or 'decode: true'";
-                            throw new Base64ValidateException(errMsg);
-                        }
-                        if (!Types.STRING.equals(colType)) {
-                            String errMsg = "Type of input columns must be string";
-                            throw new Base64ValidateException(errMsg);
-                        }
                         // encode
                         if (doEncode) {
                             String raw = reader.getString(column);
@@ -210,14 +219,5 @@ public class Base64FilterPlugin
             m.put(columnTask.getName(), columnTask);
         }
         return m;
-    }
-
-    static class Base64ValidateException
-            extends DataException
-    {
-        Base64ValidateException(String message)
-        {
-            super(message);
-        }
     }
 }
