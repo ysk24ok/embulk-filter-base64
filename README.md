@@ -103,7 +103,6 @@ timestamp to decode (timestamp) : 2017-01-01 00:00:00 UTC
 
 ### Todo
 
-* Write tests
 * [Support base64 in apache commons codec](https://github.com/ysk24ok/embulk-filter-base64/issues/1)
 * [Support encoder/decoder of URL and MIME](https://github.com/ysk24ok/embulk-filter-base64/issues/2)
 
