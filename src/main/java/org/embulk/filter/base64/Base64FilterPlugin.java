@@ -86,44 +86,21 @@ public class Base64FilterPlugin
     public PageOutput open(TaskSource taskSource, final Schema inputSchema,
             final Schema outputSchema, final PageOutput output)
     {
-        PluginTask task = taskSource.loadTask(PluginTask.class);
-        final Map<String, Base64ColumnTask> base64ColumnMap = getBase64ColumnMap(task.getColumns());
+        final PluginTask task = taskSource.loadTask(PluginTask.class);
 
         return new PageOutput() {
             private PageReader reader = new PageReader(inputSchema);
             private PageBuilder builder = new PageBuilder(
                 Exec.getBufferAllocator(), outputSchema, output);
-            private ColumnVisitorImpl visitor = new ColumnVisitorImpl(builder);
+            private ColumnVisitorImpl visitor = new ColumnVisitorImpl(
+                task, reader, builder);
 
             @Override
             public void add(Page page)
             {
                 reader.setPage(page);
                 while (reader.nextRecord()) {
-                    for (Column column: inputSchema.getColumns()) {
-                        String colName = column.getName();
-                        Type colType = column.getType();
-                        Base64ColumnTask colTask = base64ColumnMap.get(colName);
-                        // columns where nothing to be done
-                        if (colTask == null) {
-                            column.visit(visitor);
-                            continue;
-                        }
-                        Boolean doEncode = colTask.getDoEncode().get();
-                        Boolean doDecode = colTask.getDoDecode().get();
-                        // encode
-                        if (doEncode) {
-                            String raw = reader.getString(column);
-                            String encoded = Base64.getEncoder().encodeToString(raw.getBytes());
-                            builder.setString(column, encoded);
-                        }
-                        // decode
-                        if (doDecode) {
-                            String encoded = reader.getString(column);
-                            String decoded = new String(Base64.getDecoder().decode(encoded));
-                            builder.setString(column, decoded);
-                        }
-                    }
+                    outputSchema.visitColumns(visitor);
                     builder.addRecord();
                 }
             }
@@ -139,85 +116,6 @@ public class Base64FilterPlugin
             {
                 builder.close();
             }
-
-            class ColumnVisitorImpl implements ColumnVisitor
-            {
-                private final PageBuilder builder;
-
-                ColumnVisitorImpl(PageBuilder builder) {
-                    this.builder = builder;
-                }
-
-                @Override
-                public void booleanColumn(Column outputColumn)
-                {
-                    if (reader.isNull(outputColumn)) {
-                        builder.setNull(outputColumn);
-                    } else {
-                        builder.setBoolean(outputColumn, reader.getBoolean(outputColumn));
-                    }
-                }
-
-                @Override
-                public void longColumn(Column outputColumn)
-                {
-                    if (reader.isNull(outputColumn)) {
-                        builder.setNull(outputColumn);
-                    } else {
-                        builder.setLong(outputColumn, reader.getLong(outputColumn));
-                    }
-                }
-
-                @Override
-                public void doubleColumn(Column outputColumn)
-                {
-                    if (reader.isNull(outputColumn)) {
-                        builder.setNull(outputColumn);
-                    } else {
-                        builder.setDouble(outputColumn, reader.getDouble(outputColumn));
-                    }
-                }
-
-                @Override
-                public void stringColumn(Column outputColumn)
-                {
-                    if (reader.isNull(outputColumn)) {
-                        builder.setNull(outputColumn);
-                    } else {
-                        builder.setString(outputColumn, reader.getString(outputColumn));
-                    }
-                }
-
-                @Override
-                public void timestampColumn(Column outputColumn)
-                {
-                    if (reader.isNull(outputColumn)) {
-                        builder.setNull(outputColumn);
-                    } else {
-                        builder.setTimestamp(outputColumn, reader.getTimestamp(outputColumn));
-                    }
-                }
-
-                @Override
-                public void jsonColumn(Column outputColumn)
-                {
-                    if (reader.isNull(outputColumn)) {
-                        builder.setNull(outputColumn);
-                    } else {
-                        builder.setJson(outputColumn, reader.getJson(outputColumn));
-                    }
-                }
-            }
         };
-    }
-
-    static Map<String, Base64ColumnTask> getBase64ColumnMap(
-            List<Base64ColumnTask> columnTasks)
-    {
-        Map<String, Base64ColumnTask> m = new HashMap<>();
-        for (Base64ColumnTask columnTask: columnTasks) {
-            m.put(columnTask.getName(), columnTask);
-        }
-        return m;
     }
 }
