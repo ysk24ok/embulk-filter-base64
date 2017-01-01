@@ -16,6 +16,7 @@ import org.embulk.spi.TestPageBuilderReader.MockPageOutput;
 import org.embulk.spi.type.Types;
 import org.embulk.spi.util.Pages;
 import org.embulk.filter.base64.Base64FilterPlugin.PluginTask;
+import org.embulk.filter.base64.Base64FilterPlugin.PageOutputImpl;
 import org.embulk.filter.base64.ColumnVisitorImpl;
 import static org.embulk.filter.base64.TestBase64FilterPlugin.taskFromYamlString;
 
@@ -27,44 +28,6 @@ public class TestColumnVisitorImpl
 {
     @Rule
     public EmbulkTestRuntime runtime = new EmbulkTestRuntime();
-
-    public class PageOutputImpl implements PageOutput
-    {
-        private PageReader pageReader;
-        private PageBuilder pageBuilder;
-        private Schema outputSchema;
-        private ColumnVisitorImpl visitor;
-
-        PageOutputImpl(PageReader pageReader, PageBuilder pageBuilder, Schema outputSchema, ColumnVisitorImpl visitor)
-        {
-            this.pageReader = pageReader;
-            this.pageBuilder = pageBuilder;
-            this.outputSchema = outputSchema;
-            this.visitor = visitor;
-        }
-
-        @Override
-        public void add(Page page)
-        {
-            pageReader.setPage(page);
-            while (pageReader.nextRecord()) {
-                outputSchema.visitColumns(visitor);
-                pageBuilder.addRecord();
-            }
-        }
-
-        @Override
-        public void finish()
-        {
-            pageBuilder.finish();
-        }
-
-        @Override
-        public void close()
-        {
-            pageBuilder.close();
-        }
-    }
 
     private List<Object[]> filter(PluginTask task, Schema inputSchema, Object... objects)
     {

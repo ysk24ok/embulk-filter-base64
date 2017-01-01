@@ -87,35 +87,51 @@ public class Base64FilterPlugin
             final Schema outputSchema, final PageOutput output)
     {
         final PluginTask task = taskSource.loadTask(PluginTask.class);
+        PageBuilder pageBuilder = new PageBuilder(
+            Exec.getBufferAllocator(), outputSchema, output);
+        PageReader pageReader = new PageReader(inputSchema);
+        ColumnVisitorImpl visitor = new ColumnVisitorImpl(
+            task, pageReader, pageBuilder);
 
-        return new PageOutput() {
-            private PageReader reader = new PageReader(inputSchema);
-            private PageBuilder builder = new PageBuilder(
-                Exec.getBufferAllocator(), outputSchema, output);
-            private ColumnVisitorImpl visitor = new ColumnVisitorImpl(
-                task, reader, builder);
-
-            @Override
-            public void add(Page page)
-            {
-                reader.setPage(page);
-                while (reader.nextRecord()) {
-                    outputSchema.visitColumns(visitor);
-                    builder.addRecord();
-                }
-            }
-
-            @Override
-            public void finish()
-            {
-                builder.finish();
-            }
-
-            @Override
-            public void close()
-            {
-                builder.close();
-            }
-        };
+        return new PageOutputImpl(
+            pageReader, pageBuilder, outputSchema, visitor);
     }
+
+    public static class PageOutputImpl implements PageOutput
+    {
+        private PageReader pageReader;
+        private PageBuilder pageBuilder;
+        private Schema outputSchema;
+        private ColumnVisitorImpl visitor;
+
+        PageOutputImpl(PageReader pageReader, PageBuilder pageBuilder, Schema outputSchema, ColumnVisitorImpl visitor)
+        {
+            this.pageReader = pageReader;
+            this.pageBuilder = pageBuilder;
+            this.outputSchema = outputSchema;
+            this.visitor = visitor;
+        }
+
+        @Override
+        public void add(Page page)
+        {
+            pageReader.setPage(page);
+            while (pageReader.nextRecord()) {
+                outputSchema.visitColumns(visitor);
+                pageBuilder.addRecord();
+            }
+        }
+
+        @Override
+        public void finish()
+        {
+            pageBuilder.finish();
+        }
+
+        @Override
+        public void close()
+        {
+            pageBuilder.close();
+        }
+    };
 }
