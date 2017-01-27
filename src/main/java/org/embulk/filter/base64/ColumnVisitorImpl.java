@@ -15,40 +15,39 @@ import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageReader;
 import org.embulk.spi.Schema;
 
-import org.embulk.filter.base64.Base64FilterPlugin.Base64ColumnTask;
+import org.embulk.filter.base64.Base64FilterPlugin.ColumnTask;
 import org.embulk.filter.base64.Base64FilterPlugin.PluginTask;
 
-public class ColumnVisitorImpl
-        implements ColumnVisitor
+public class ColumnVisitorImpl implements ColumnVisitor
 {
     private final PageReader pageReader;
     private final PageBuilder pageBuilder;
-    private final Map<String, Base64ColumnTask> base64ColumnMap;
+    private final Map<String, ColumnTask> columnTaskMap;
 
     ColumnVisitorImpl(PluginTask task, PageReader reader, PageBuilder builder)
     {
         this.pageReader = reader;
         this.pageBuilder = builder;
-        this.base64ColumnMap = getBase64ColumnMap(task.getColumns());
+        this.columnTaskMap = getColumnTaskMap(task.getColumns());
     }
 
-    private static Map<String, Base64ColumnTask> getBase64ColumnMap(
-            List<Base64ColumnTask> columnTasks)
+    private Map<String, ColumnTask> getColumnTaskMap(
+            List<ColumnTask> columnTasks)
     {
-        Map<String, Base64ColumnTask> m = new HashMap<>();
-        for (Base64ColumnTask columnTask : columnTasks) {
+        Map<String, ColumnTask> m = new HashMap<>();
+        for (ColumnTask columnTask : columnTasks) {
             m.put(columnTask.getName(), columnTask);
         }
         return m;
     }
 
-    private Base64ColumnTask getTask(Column column)
+    private ColumnTask getTask(Column column)
     {
         String colName = column.getName();
-        return base64ColumnMap.get(colName);
+        return columnTaskMap.get(colName);
     }
 
-    private String executeTask(Base64ColumnTask task, Column column)
+    private String executeTask(ColumnTask task, Column column)
     {
         boolean doEncode = task.getDoEncode().get();
         boolean doDecode = task.getDoDecode().get();
@@ -108,16 +107,14 @@ public class ColumnVisitorImpl
             pageBuilder.setNull(outputColumn);
         }
         else {
-            Base64ColumnTask task = getTask(outputColumn);
-            // when there is no task executed on this column
+            ColumnTask task = getTask(outputColumn);
             if (task == null) {
                 pageBuilder.setString(
                     outputColumn, pageReader.getString(outputColumn));
-            // when there is a task
             }
             else {
-                String str = executeTask(task, outputColumn);
-                pageBuilder.setString(outputColumn, str);
+                pageBuilder.setString(
+                    outputColumn, executeTask(task, outputColumn));
             }
         }
     }

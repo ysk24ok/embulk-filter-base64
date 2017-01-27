@@ -31,10 +31,10 @@ public class Base64FilterPlugin
             extends Task
     {
         @Config("columns")
-        public List<Base64ColumnTask> getColumns();
+        public List<ColumnTask> getColumns();
     }
 
-    public interface Base64ColumnTask
+    public interface ColumnTask
             extends Task
     {
         @Config("name")
@@ -51,8 +51,8 @@ public class Base64FilterPlugin
 
     public void validate(PluginTask pluginTask, Schema inputSchema)
     {
-        for (Base64ColumnTask task : pluginTask.getColumns()) {
-            // throws exception if the column name does not exist
+        for (ColumnTask task : pluginTask.getColumns()) {
+            // throws exception when the column does not exist
             inputSchema.lookupColumn(task.getName());
             boolean doEncode = task.getDoEncode().get();
             boolean doDecode = task.getDoDecode().get();
