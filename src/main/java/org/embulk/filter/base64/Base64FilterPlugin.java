@@ -4,11 +4,11 @@ import com.google.common.base.Optional;
 
 import org.embulk.config.Config;
 import org.embulk.config.ConfigDefault;
+import org.embulk.config.ConfigException;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.Task;
 import org.embulk.config.TaskSource;
 import org.embulk.spi.Column;
-import org.embulk.spi.DataException;
 import org.embulk.spi.Exec;
 import org.embulk.spi.FilterPlugin;
 import org.embulk.spi.Page;
@@ -58,12 +58,12 @@ public class Base64FilterPlugin
             boolean bothFalse = !doEncode && !doDecode;
             if (bothTrue || bothFalse) {
                 String errMsg = "Specify either 'encode: true' or 'decode: true'";
-                throw new DataException(errMsg);
+                throw new ConfigException(errMsg);
             }
             Type colType = column.getType();
             if (!Types.STRING.equals(colType)) {
                 String errMsg = "Type of input columns must be string";
-                throw new DataException(errMsg);
+                throw new ConfigException(errMsg);
             }
         }
     }

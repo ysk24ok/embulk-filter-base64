@@ -1,10 +1,10 @@
 package org.embulk.filter.base64;
 
 import org.embulk.EmbulkTestRuntime;
+import org.embulk.config.ConfigException;
 import org.embulk.config.ConfigLoader;
 import org.embulk.config.ConfigSource;
 import org.embulk.filter.base64.Base64FilterPlugin.PluginTask;
-import org.embulk.spi.DataException;
 import org.embulk.spi.Exec;
 import org.embulk.spi.Schema;
 import org.embulk.spi.SchemaConfigException;
@@ -48,7 +48,7 @@ public class TestBase64FilterPlugin
         plugin.validate(task, inputSchema);
     }
 
-    @Test(expected = DataException.class)
+    @Test(expected = ConfigException.class)
     public void testValidate_bothSpecified()
     {
         PluginTask task = taskFromYamlString(
@@ -62,7 +62,7 @@ public class TestBase64FilterPlugin
         plugin.validate(task, inputSchema);
     }
 
-    @Test(expected = DataException.class)
+    @Test(expected = ConfigException.class)
     public void testValidate_bothNotSpecified()
     {
         PluginTask task = taskFromYamlString(
@@ -76,7 +76,7 @@ public class TestBase64FilterPlugin
         plugin.validate(task, inputSchema);
     }
 
-    @Test(expected = DataException.class)
+    @Test(expected = ConfigException.class)
     public void testValidate_invalidInputType()
     {
         PluginTask task = taskFromYamlString(
