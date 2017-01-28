@@ -1,10 +1,11 @@
 package org.embulk.filter.base64;
 
+import com.google.common.io.BaseEncoding;
+
 import org.embulk.filter.base64.Base64FilterPlugin.ColumnTask;
 import org.embulk.filter.base64.Base64FilterPlugin.PluginTask;
 import org.embulk.spi.Column;
 
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +47,9 @@ public class Base64Filter
         boolean doDecode = colTask.getDoDecode().get();
         // encode
         if (doEncode && ! doDecode) {
-            return Base64.getEncoder().encodeToString(inputValue.getBytes());
+            return BaseEncoding.base64().encode(inputValue.getBytes());
         }
         // decode
-        return new String(Base64.getDecoder().decode(inputValue));
+        return new String(BaseEncoding.base64().decode(inputValue));
     }
 }
