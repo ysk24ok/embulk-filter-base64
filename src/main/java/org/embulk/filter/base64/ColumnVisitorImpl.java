@@ -1,22 +1,17 @@
 package org.embulk.filter.base64;
 
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Base64;
-
-import org.embulk.config.Config;
-import org.embulk.config.ConfigDefault;
-import org.embulk.config.Task;
-import org.embulk.spi.Column;
-import org.embulk.spi.ColumnVisitor;
-import org.embulk.spi.DataException;
-import org.embulk.spi.PageBuilder;
-import org.embulk.spi.PageReader;
-import org.embulk.spi.Schema;
-
 import org.embulk.filter.base64.Base64FilterPlugin.ColumnTask;
 import org.embulk.filter.base64.Base64FilterPlugin.PluginTask;
+
+import org.embulk.spi.Column;
+import org.embulk.spi.ColumnVisitor;
+import org.embulk.spi.PageBuilder;
+import org.embulk.spi.PageReader;
+
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ColumnVisitorImpl implements ColumnVisitor
 {

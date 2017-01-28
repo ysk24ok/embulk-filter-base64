@@ -3,12 +3,12 @@ package org.embulk.filter.base64;
 import org.embulk.EmbulkTestRuntime;
 import org.embulk.config.ConfigLoader;
 import org.embulk.config.ConfigSource;
+import org.embulk.filter.base64.Base64FilterPlugin.PluginTask;
 import org.embulk.spi.DataException;
 import org.embulk.spi.Exec;
 import org.embulk.spi.Schema;
 import org.embulk.spi.SchemaConfigException;
 import org.embulk.spi.type.Types;
-import org.embulk.filter.base64.Base64FilterPlugin.PluginTask;
 
 import org.junit.Rule;
 import org.junit.Test;

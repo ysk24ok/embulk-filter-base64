@@ -1,11 +1,8 @@
 package org.embulk.filter.base64;
 
-import java.util.List;
-
 import org.embulk.EmbulkTestRuntime;
-import org.embulk.config.ConfigLoader;
-import org.embulk.config.ConfigSource;
-import org.embulk.spi.Exec;
+import org.embulk.filter.base64.Base64FilterPlugin.PageOutputImpl;
+import org.embulk.filter.base64.Base64FilterPlugin.PluginTask;
 import org.embulk.spi.Page;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
@@ -15,14 +12,14 @@ import org.embulk.spi.Schema;
 import org.embulk.spi.TestPageBuilderReader.MockPageOutput;
 import org.embulk.spi.type.Types;
 import org.embulk.spi.util.Pages;
-import org.embulk.filter.base64.Base64FilterPlugin.PluginTask;
-import org.embulk.filter.base64.Base64FilterPlugin.PageOutputImpl;
-import org.embulk.filter.base64.ColumnVisitorImpl;
-import static org.embulk.filter.base64.TestBase64FilterPlugin.taskFromYamlString;
 
 import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.embulk.filter.base64.TestBase64FilterPlugin.taskFromYamlString;
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
 
 public class TestColumnVisitorImpl
 {
