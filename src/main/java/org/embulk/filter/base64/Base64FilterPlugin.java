@@ -50,7 +50,8 @@ public class Base64FilterPlugin
     {
         for (ColumnTask task : pluginTask.getColumns()) {
             // throws exception when the column does not exist
-            inputSchema.lookupColumn(task.getName());
+            Column column = inputSchema.lookupColumn(task.getName());
+            // check 'encode: true' or 'decode: true' in ColumnTask
             boolean doEncode = task.getDoEncode().get();
             boolean doDecode = task.getDoDecode().get();
             boolean bothTrue = doEncode && doDecode;
@@ -59,8 +60,6 @@ public class Base64FilterPlugin
                 String errMsg = "Specify either 'encode: true' or 'decode: true'";
                 throw new DataException(errMsg);
             }
-        }
-        for (Column column : inputSchema.getColumns()) {
             Type colType = column.getType();
             if (!Types.STRING.equals(colType)) {
                 String errMsg = "Type of input columns must be string";
