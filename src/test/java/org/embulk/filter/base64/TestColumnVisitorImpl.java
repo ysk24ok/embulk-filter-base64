@@ -33,8 +33,9 @@ public class TestColumnVisitorImpl
         PageBuilder pageBuilder = new PageBuilder(
             runtime.getBufferAllocator(), outputSchema, output);
         PageReader pageReader = new PageReader(inputSchema);
+        Base64Filter filter = new Base64Filter(task);
         ColumnVisitorImpl visitor = new ColumnVisitorImpl(
-            task, pageReader, pageBuilder);
+            pageReader, pageBuilder, filter);
 
         List<Page> pages = PageTestUtils.buildPage(
             runtime.getBufferAllocator(), inputSchema, objects);

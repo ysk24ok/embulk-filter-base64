@@ -86,8 +86,9 @@ public class Base64FilterPlugin
         PageBuilder pageBuilder = new PageBuilder(
             Exec.getBufferAllocator(), outputSchema, output);
         PageReader pageReader = new PageReader(inputSchema);
+        Base64Filter filter = new Base64Filter(task);
         ColumnVisitorImpl visitor = new ColumnVisitorImpl(
-            task, pageReader, pageBuilder);
+            pageReader, pageBuilder, filter);
 
         return new PageOutputImpl(
             pageReader, pageBuilder, outputSchema, visitor);
