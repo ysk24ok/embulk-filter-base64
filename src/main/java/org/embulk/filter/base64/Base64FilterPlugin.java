@@ -19,6 +19,7 @@ import org.embulk.spi.Schema;
 import org.embulk.spi.type.Type;
 import org.embulk.spi.type.Types;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Base64FilterPlugin
@@ -44,6 +45,18 @@ public class Base64FilterPlugin
         @Config("decode")
         @ConfigDefault("false")
         public Optional<Boolean> getDoDecode();
+
+        @Config("encoding")
+        @ConfigDefault("\"Base64\"")
+        public String getEncoding();
+
+        @Config("urlsafe")
+        @ConfigDefault("false")
+        public Optional<Boolean> getDoUrlsafe();
+
+        @Config("hex")
+        @ConfigDefault("false")
+        public Optional<Boolean> getUseHex();
     }
 
     public void validate(PluginTask pluginTask, Schema inputSchema)
@@ -60,6 +73,14 @@ public class Base64FilterPlugin
                 String errMsg = "Specify either 'encode: true' or 'decode: true'";
                 throw new ConfigException(errMsg);
             }
+            // check 'encoding' option in ColumnTask
+            String[] allowedEncordings = {"Base16", "Base32", "Base64"};
+            String encoding = task.getEncoding();
+            if (!Arrays.asList(allowedEncordings).contains(encoding)) {
+                String errMsg = "Encording must be one of the following: Base16, Base32, Base64";
+                throw new ConfigException(errMsg);
+            }
+            // check type of input cloumn
             Type colType = column.getType();
             if (!Types.STRING.equals(colType)) {
                 String errMsg = "Type of input columns must be string";

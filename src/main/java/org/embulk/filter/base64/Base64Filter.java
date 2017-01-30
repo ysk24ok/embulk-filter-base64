@@ -9,6 +9,7 @@ import org.embulk.spi.Column;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Base64Filter
 {
@@ -43,13 +44,57 @@ public class Base64Filter
         if (colTask == null) {
             return inputValue;
         }
+        String encoding = colTask.getEncoding();
         boolean doEncode = colTask.getDoEncode().get();
         boolean doDecode = colTask.getDoDecode().get();
         // encode
         if (doEncode && ! doDecode) {
-            return BaseEncoding.base64().encode(inputValue.getBytes());
+            byte[] inputAsBytes = inputValue.getBytes();
+            String encoded = null;
+            if (Objects.equals(encoding, "Base64")) {
+                if (colTask.getDoUrlsafe().get()) {
+                    encoded = BaseEncoding.base64Url().encode(inputAsBytes);
+                }
+                else {
+                    encoded = BaseEncoding.base64().encode(inputAsBytes);
+                }
+            }
+            else if (Objects.equals(encoding, "Base32")) {
+                if (colTask.getUseHex().get()) {
+                    encoded = BaseEncoding.base32Hex().encode(inputAsBytes);
+                }
+                else {
+                    encoded = BaseEncoding.base32().encode(inputAsBytes);
+                }
+            }
+            else if (Objects.equals(encoding, "Base16")) {
+                encoded = BaseEncoding.base16().encode(inputAsBytes);
+            }
+            return encoded;
         }
         // decode
-        return new String(BaseEncoding.base64().decode(inputValue));
+        else {
+            byte[] decodedAsBytes = null;
+            if (Objects.equals(encoding, "Base64")) {
+                if (colTask.getDoUrlsafe().get()) {
+                    decodedAsBytes = BaseEncoding.base64Url().decode(inputValue);
+                }
+                else {
+                    decodedAsBytes = BaseEncoding.base64().decode(inputValue);
+                }
+            }
+            else if (Objects.equals(encoding, "Base32")) {
+                if (colTask.getUseHex().get()) {
+                    decodedAsBytes = BaseEncoding.base32Hex().decode(inputValue);
+                }
+                else {
+                    decodedAsBytes = BaseEncoding.base32().decode(inputValue);
+                }
+            }
+            else if (Objects.equals(encoding, "Base16")) {
+                decodedAsBytes = BaseEncoding.base16().decode(inputValue);
+            }
+            return new String(decodedAsBytes);
+        }
     }
 }

@@ -39,8 +39,8 @@ public class TestBase64FilterPlugin
         PluginTask task = taskFromYamlString(
             "type: base64",
             "columns:",
-            "  - {name: to encode, type: string, encode: true}",
-            "  - {name: to decode, type: string, decode: true}"
+            "  - {name: to encode, encode: true}",
+            "  - {name: to decode, decode: true}"
         );
         Schema inputSchema = Schema.builder()
             .add("to encode", Types.STRING)
@@ -54,7 +54,7 @@ public class TestBase64FilterPlugin
         PluginTask task = taskFromYamlString(
             "type: base64",
             "columns:",
-            "  - {name: to encode, type: string, encode: true, decode: true}"
+            "  - {name: to encode, encode: true, decode: true}"
         );
         Schema inputSchema = Schema.builder()
             .add("to encode", Types.STRING)
@@ -68,7 +68,7 @@ public class TestBase64FilterPlugin
         PluginTask task = taskFromYamlString(
             "type: base64",
             "columns:",
-            "  - {name: to encode, type: string}"
+            "  - {name: to encode}"
         );
         Schema inputSchema = Schema.builder()
             .add("to encode", Types.STRING)
@@ -82,7 +82,7 @@ public class TestBase64FilterPlugin
         PluginTask task = taskFromYamlString(
             "type: base64",
             "columns:",
-            "  - {name: to encode, type: string, type: double}"
+            "  - {name: to encode, encode: true}"
         );
         Schema inputSchema = Schema.builder()
             .add("to encode", Types.DOUBLE)
