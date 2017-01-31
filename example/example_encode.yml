@@ -4,21 +4,19 @@ in:
   parser:
     type: csv
     columns:
-      - {name: id, type: long}
-      - {name: string to encode, type: string}
-      - {name: long to encode, type: string}
-      - {name: double to encode, type: string}
-      - {name: boolean to encode, type: string}
-      - {name: timestamp to encode, type: string}
-      - {name: json to encode, type: string}
+      - {name: id,        type: long}
+      - {name: Base64,    type: string}
+      - {name: Base64Url, type: string}
+      - {name: Base32,    type: string}
+      - {name: Base32Hex, type: string}
+      - {name: Base16,    type: string}
 filters:
   - type: base64
     columns:
-      - {name: string to encode, encode: true}
-      - {name: long to encode, encode: true}
-      - {name: double to encode, encode: true}
-      - {name: boolean to encode, encode: true}
-      - {name: timestamp to encode, encode: true}
-      - {name: json to encode, encode: true}
+      - {name: Base64,    encode: true}
+      - {name: Base64Url, encode: true, urlsafe: true}
+      - {name: Base32,    encode: true, encoding: Base32}
+      - {name: Base32Hex, encode: true, encoding: Base32, hex: true}
+      - {name: Base16,    encode: true, encoding: Base16}
 out:
   type: stdout
