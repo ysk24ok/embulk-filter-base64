@@ -13,7 +13,7 @@ configurations {
     provided
 }
 
-version = "0.1.1"
+version = "0.2.0"
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -76,7 +76,7 @@ Gem::Specification.new do |spec|
   spec.version       = "${project.version}"
   spec.authors       = ["Yusuke NISHIOKA"]
   spec.summary       = %[Base64 filter plugin for Embulk]
-  spec.description   = %[An Embulk filter plugin to encode/decode string by Base64.]
+  spec.description   = %[An Embulk filter plugin to encode/decode string by Base64, Base32 and Base16.]
   spec.email         = ["yusuke.nishioka.0713@gmail.com"]
   spec.licenses      = ["MIT"]
   spec.homepage      = "https://github.com/ysk24ok/embulk-filter-base64"
